@@ -2,12 +2,12 @@ from flask import Flask
 
 app = Flask(__name__)
 
-VERSION = "1.0.0"
+VERSION = "1.1.0"
 
 
 @app.route("/")
 def home():
-    return f"Blue-Green Demo Application - Version {VERSION}\n"
+    return f"Blue-Green Demo Application - Version {VERSION} - GREEN\n"
 
 
 @app.route("/health")
