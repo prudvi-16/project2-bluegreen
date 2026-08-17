@@ -48,11 +48,7 @@ pipeline {
         stage('Switch Traffic') {
             steps {
                 sh '''
-                    sudo sed -i 's/proxy_pass http:\\/\\/blue;/proxy_pass http:\\/\\/green;/' \
-                        /etc/nginx/conf.d/bluegreen.conf
-
-                    sudo nginx -t
-                    sudo systemctl reload nginx
+                    sudo -n /usr/local/bin/bluegreen-switch
                 '''
             }
         }
