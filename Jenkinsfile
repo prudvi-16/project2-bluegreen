@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         IMAGE = "bluegreen-app"
-        VERSION = "1.1.0"
+        VERSION = "1.2.0-bad"
         GREEN_PORT = "8082"
     }
 
