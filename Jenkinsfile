@@ -48,7 +48,7 @@ pipeline {
         stage('Switch Traffic') {
             steps {
                 sh '''
-                    sudo -n /usr/local/bin/bluegreen-switch
+                    sudo -n /usr/local/bin/bluegreen-switch green
                 '''
             }
         }
