@@ -9,12 +9,6 @@ pipeline {
 
     stages {
 
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
                 sh '''
@@ -39,6 +33,8 @@ pipeline {
         stage('Health Check') {
             steps {
                 sh '''
+                    echo "Checking GREEN environment health..."
+
                     for i in 1 2 3 4 5
                     do
                         if curl -f http://localhost:${GREEN_PORT}/health
@@ -47,7 +43,7 @@ pipeline {
                             exit 0
                         fi
 
-                        echo "Waiting for GREEN... attempt $i/5"
+                        echo "GREEN not ready - attempt $i/5"
                         sleep 3
                     done
 
@@ -68,8 +64,11 @@ pipeline {
         stage('Production Verification') {
             steps {
                 sh '''
+                    echo "Verifying production environment..."
+
                     curl -f http://localhost/health
                     curl -f http://localhost/
+
                     echo "Production verification passed"
                 '''
             }
@@ -77,12 +76,14 @@ pipeline {
     }
 
     post {
+
         success {
             echo 'Blue-Green deployment completed successfully.'
         }
 
         failure {
-            echo 'Deployment failed. Production traffic was not promoted unless the switch stage had already completed.'
+            echo 'Deployment failed. Traffic was not promoted if failure occurred before the traffic-switch stage.'
         }
+
     }
 }
