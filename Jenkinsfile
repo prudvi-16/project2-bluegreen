@@ -39,8 +39,20 @@ pipeline {
         stage('Health Check') {
             steps {
                 sh '''
-                    sleep 3
-                    curl -f http://localhost:${GREEN_PORT}/health
+                    for i in 1 2 3 4 5
+                    do
+                        if curl -f http://localhost:${GREEN_PORT}/health
+                        then
+                            echo "GREEN health check passed"
+                            exit 0
+                        fi
+
+                        echo "Waiting for GREEN... attempt $i/5"
+                        sleep 3
+                    done
+
+                    echo "GREEN health check failed"
+                    exit 1
                 '''
             }
         }
@@ -51,6 +63,26 @@ pipeline {
                     sudo -n /usr/local/bin/bluegreen-switch green
                 '''
             }
+        }
+
+        stage('Production Verification') {
+            steps {
+                sh '''
+                    curl -f http://localhost/health
+                    curl -f http://localhost/
+                    echo "Production verification passed"
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Blue-Green deployment completed successfully.'
+        }
+
+        failure {
+            echo 'Deployment failed. Production traffic was not promoted unless the switch stage had already completed.'
         }
     }
 }
